@@ -1,21 +1,42 @@
-// Getting_Configuration_Options.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
-#include "pch.h"
+#include <boost/program_options.hpp>
 #include <iostream>
 
-int main()
+namespace opt = boost::program_options;
+
+int main(int argc, char *argv[])
 {
-    std::cout << "Hello World!\n"; 
+	
+	// Constructing an options describing variable and giving
+	// it a textual description "All options".
+	opt::options_description desc("All options");
+
+	
+	// When we are adding options, first parameter is a name
+	// to be used in command line. Second parameter is a type
+	// of that option, wrapped in value<> class. Third parameter
+	// must be a short description of that option.
+	desc.add_options()
+	("apples", opt::value<int>(), "how many apples do you have")
+	("oranges", opt::value<int>(), "how many oranges do you have")
+	("help", "produce help message");
+
+
+	
+	// Variable to store our command line arguments.
+	opt::variables_map vm;
+	
+	// Parsing and storing arguments.
+	opt::store(opt::parse_command_line(argc, argv, desc), vm);
+	
+	// Must be called after all the parsing and storing.
+	opt::notify(vm);
+
+
+	if (vm.count("help")) {
+		std::cout << desc << "\n";
+		return 1;
+	}
+
+	std::cout << "Fruits count: " << vm["apples"].as<int>() + vm["oranges"].as<int>()
+		<< std::endl;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
